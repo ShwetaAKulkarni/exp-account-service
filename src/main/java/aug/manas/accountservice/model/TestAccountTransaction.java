@@ -14,17 +14,20 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * @author shweta
  *
  */
 @Entity
-@Table(name = "exp_transaction")
-public class ExpTransaction implements Serializable {
+@Table(name = "test_account_transaction")
+public class TestAccountTransaction implements Serializable {
 
 	private static final long serialVersionUID = -302209030368856060L;
 
@@ -39,20 +42,37 @@ public class ExpTransaction implements Serializable {
 	@Column(name = "transaction_type")
 	private TransactionType type;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "EST")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;
 	private BigDecimal amount;
 
+	@OneToOne(mappedBy = "accountTransaction")
+	private TestUserTransaction userTransaction;
 
-	protected ExpTransaction() {
+	public TestAccountTransaction() {
 
 	}
 
-	public ExpTransaction(String description, Date date, TransactionType type, BigDecimal amount) {
+	public TestAccountTransaction(String description, Date date, TransactionType type, BigDecimal amount,
+			TestUserTransaction userTransaction) {
 		this.description = description;
 		this.date = date;
 		this.type = type;
 		this.amount = amount;
+		this.userTransaction = userTransaction;
+	}
+
+	public TestAccountTransaction(String description, Date date, TransactionType type, BigDecimal amount) {
+		this.description = description;
+		this.date = date;
+		this.type = type;
+		this.amount = amount;
+		
+	}
+
+	public void setUserTransaction(TestUserTransaction userTransaction) {
+		this.userTransaction = userTransaction;
 	}
 
 	public long getId() {
@@ -95,4 +115,15 @@ public class ExpTransaction implements Serializable {
 		this.amount = amount;
 	}
 
+	public TestUserTransaction getUserTransaction() {
+		return userTransaction;
+	}
+
+	@Override
+	public String toString() {
+		return "AccountTransaction:: TransactionId: " + this.getId() + " Description: " + this.getDescription()
+				+ " TransactionType: " + this.getType() + "TransactionDate: " + this.getDate() + " Amount: "
+				+ this.getAmount();
+
+	}
 }

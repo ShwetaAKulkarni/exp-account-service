@@ -24,18 +24,22 @@ public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
-	private long id;
+	private Long id;
 	private String username;
-	
-	//@JsonIgnore
+
 	private String password;
 	private String firstName;
 	private String lastName;
 	private String email;
+	private boolean active;
 
-/*	@OneToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "user_transaction1", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "trans_id"))
-	private List<ExpTransaction> transactions;  */
+	/*
+	 * @OneToMany(cascade = CascadeType.ALL)
+	 * 
+	 * @JoinTable(name = "user_transaction1", joinColumns = @JoinColumn(name =
+	 * "user_id"), inverseJoinColumns = @JoinColumn(name = "trans_id")) private
+	 * List<ExpTransaction> transactions;
+	 */
 
 	protected User() {
 
@@ -47,25 +51,15 @@ public class User implements Serializable {
 		this.username = username;
 		this.password = password;
 		this.email = email;
+		this.active = true;
 
 	}
-/*
-	public User(String firstName, String lastName, String username, String password, String email,
-			List<ExpTransaction> transactions) {
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.username = username;
-		this.password = password;
-		this.email = email;
-		this.transactions = transactions;
 
-	} */
-
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -109,12 +103,12 @@ public class User implements Serializable {
 		this.email = email;
 	}
 
-/*	public List<ExpTransaction> getTransactions() {
-		return transactions;
+	public boolean isActive() {
+		return active;
 	}
 
-	public void setTransactions(List<ExpTransaction> transactions) {
-		this.transactions = transactions;
-	}  */
+	public void setActive(boolean active) {
+		this.active = active;
+	}
 
 }

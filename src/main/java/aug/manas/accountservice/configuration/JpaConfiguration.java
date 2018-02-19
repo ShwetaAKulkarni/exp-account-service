@@ -29,8 +29,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import com.zaxxer.hikari.HikariDataSource;
-
 /**
  * @author shweta
  *

@@ -16,7 +16,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "user_transaction")
-public class ExpUserTransaction implements Serializable {
+public class UserTransaction implements Serializable {
 
 	private static final long serialVersionUID = -302209030368856060L;
 
@@ -51,11 +51,11 @@ public class ExpUserTransaction implements Serializable {
 		this.transId = transId;
 	}
 
-	protected ExpUserTransaction(){
+	protected UserTransaction(){
 		
 	}
 	
-	public ExpUserTransaction(long userId, long transId){
+	public UserTransaction(long userId, long transId){
 		this.userId = userId;
 		this.transId = transId;
 	}

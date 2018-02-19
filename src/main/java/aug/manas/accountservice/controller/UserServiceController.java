@@ -39,23 +39,37 @@ public class UserServiceController {
 		logger.info("Getting list of all users");
 		List<User> users = userService.findAllUsers();
 
-		if (users.isEmpty()) {
+		if (users != null && users.isEmpty()) {
 			return new ResponseEntity(HttpStatus.NO_CONTENT);
 		}
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
 	}
-
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public ResponseEntity<?> getUser(@PathVariable("id") long id) throws ExpAccountServiceException {
-		logger.info("Fetching User with id {}", id);
-		User user = userService.findById(id);
+	
+	/**
+	 * Get User Information
+	 * @param userId
+	 * @return
+	 * @throws ExpAccountServiceException
+	 */
+	
+	@RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+	public ResponseEntity<?> getUser(@PathVariable("userId") long userId) throws ExpAccountServiceException {
+		logger.info("Fetching User with userId {}", userId);
+		User user = userService.findById(userId);
 		if (user == null) {
-			logger.error("User with id {} not found.", id);
-			throw new ExpAccountServiceException("User with id " + id + " doesn´t exist");
+			logger.error("User with id {} not found.", userId);
+			throw new ExpAccountServiceException("User with id " + userId + " doesn´t exist");
 		}
 		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 
+	/**
+	 * Create a new User
+	 * @param user
+	 * @param ucBuilder
+	 * @return
+	 * @throws ExpAccountServiceException
+	 */
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<?> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder)
 			throws ExpAccountServiceException {
@@ -73,16 +87,23 @@ public class UserServiceController {
 		return new ResponseEntity<String>(headers, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody User user)
+	/**
+	 * Update the user
+	 * @param userId
+	 * @param user
+	 * @return
+	 * @throws ExpAccountServiceException
+	 */
+	@RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
+	public ResponseEntity<?> updateUser(@PathVariable("userId") long userId, @RequestBody User user)
 			throws ExpAccountServiceException {
-		logger.info("Updating User with id {}", id);
+		logger.info("Updating User with id {}", userId);
 
-		User currentUser = userService.findById(id);
+		User currentUser = userService.findById(userId);
 
 		if (currentUser == null) {
-			logger.error("Unable to update. User with id {} not found.", id);
-			throw new ExpAccountServiceException("Unable to upate. User with id " + id + " not found.");
+			logger.error("Unable to update. User with id {} not found.", userId);
+			throw new ExpAccountServiceException("Unable to upate. User with id " + userId + " not found.");
 
 		}
 
@@ -96,25 +117,32 @@ public class UserServiceController {
 		return new ResponseEntity<User>(currentUser, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<?> deleteUser(@PathVariable("id") long id) throws ExpAccountServiceException {
-		logger.info("Fetching & Deleting User with id {}", id);
+	/***
+	 * Deactivating the user
+	 * @param userId
+	 * @return
+	 * @throws ExpAccountServiceException
+	 */
+	//check this method logic 
+	@RequestMapping(value = "/deactivate/{userId}", method = RequestMethod.PUT)
+	public ResponseEntity<?> deactivateUser(@PathVariable("userId") long userId) throws ExpAccountServiceException {
+		logger.info("Fetching & Deactivating User with id {}", userId);
 
-		User user = userService.findById(id);
+		User user = userService.findById(userId);
 		if (user == null) {
-			logger.error("Unable to delete. User with id {} not found.", id);
-			throw new ExpAccountServiceException("Unable to delete. User with id " + id + " not found.");
+			logger.error("Unable to delete. User with id {} not found.", userId);
+			throw new ExpAccountServiceException("Unable to deactivate. User with id " + userId + " not found.");
 		}
-		userService.deleteUserById(id);
-		return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
+		boolean isActive = userService.deactivateUser(userId);
+		return new ResponseEntity<User>(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/deleteAll", method = RequestMethod.DELETE)
-	public ResponseEntity<User> deleteAllUsers() {
-		logger.info("Deleting All Users");
-
-		userService.deleteAllUsers();
-		return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
-	}
+//	@RequestMapping(value = "/deleteAll", method = RequestMethod.DELETE)
+//	public ResponseEntity<User> deleteAllUsers() {
+//		logger.info("Deleting All Users");
+//
+//		userService.deleteAllUsers();
+//		return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
+//	}
 
 }

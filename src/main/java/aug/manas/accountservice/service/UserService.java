@@ -5,7 +5,6 @@ package aug.manas.accountservice.service;
 
 import java.util.List;
 
-import aug.manas.accountservice.model.ExpTransaction;
 import aug.manas.accountservice.model.User;
 
 /**
@@ -13,28 +12,23 @@ import aug.manas.accountservice.model.User;
  *
  */
 public interface UserService {
-	 
-	User findById(Long id);
+
+	User findById(Long userId);
 
 	User findByUsername(String username);
-	
-	 User findUserByEmail(String email);
 
-	void saveUser(User user);
+	User findUserByEmail(String email);
 
-	void updateUser(User user);
+	User createUser(User user);
 
-	void deleteUserById(Long id);
+	User saveUser(User user);
 
-	void deleteAllUsers();
+	User updateUser(User user);
 
 	List<User> findAllUsers();
 
+	boolean deactivateUser(Long userId);
+
 	boolean isUserExist(User user);
-	
-	List<ExpTransaction> getAllTransactions(long id);
-	
-	void addExpTransaction(long id , ExpTransaction t);
-	
-	//delete, update  
+
 }

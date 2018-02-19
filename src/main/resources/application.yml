@@ -10,10 +10,13 @@ spring:
 ---
 spring:
   profiles: local,default,test
-   
+  h2:
+    console:
+      enabled: true
+      
 datasource:
   exp-mgr:
-    url: jdbc:h2:~/test
+    url: jdbc:h2:mem:exp-mgr
     username: SA
     password:
     driverClassName: org.h2.Driver
@@ -21,7 +24,7 @@ datasource:
     maxPoolSize: 10
     hibernate:
       hbm2ddl.method: create-drop
-      show_sql: true
+      show_sql: false
       format_sql: true
       dialect: org.hibernate.dialect.H2Dialect
 ---
