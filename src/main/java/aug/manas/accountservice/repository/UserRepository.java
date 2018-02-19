@@ -1,0 +1,20 @@
+/**
+ * 
+ */
+package aug.manas.accountservice.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import aug.manas.accountservice.model.User;
+
+/**
+ * @author shweta
+ *
+ */
+//@Repository("userRepository")
+public interface UserRepository extends JpaRepository<User, Long> {
+
+	User findByEmail(String email);
+	User findByUsername(String username);
+
+}

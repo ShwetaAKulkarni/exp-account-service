@@ -1,0 +1,45 @@
+server:
+  port: 8081
+  contextPath: /exp-account-service
+spring:
+  profiles:
+    active: "prod"
+  data:
+    rest:
+      base-path: /api
+---
+spring:
+  profiles: local,default,test
+  h2:
+    console:
+      enabled: true
+      
+datasource:
+  exp-mgr:
+    url: jdbc:h2:mem:exp-mgr
+    username: SA
+    password:
+    driverClassName: org.h2.Driver
+    defaultSchema:
+    maxPoolSize: 10
+    hibernate:
+      hbm2ddl.method: create-drop
+      show_sql: false
+      format_sql: true
+      dialect: org.hibernate.dialect.H2Dialect
+---
+spring:
+  profiles: prod
+datasource:
+  exp-mgr:
+    url: jdbc:mysql://localhost:3306/expense_manager
+    username: root
+    password: root
+    driverClassName: com.mysql.jdbc.Driver
+    defaultSchema:
+    maxPoolSize: 20
+    hibernate:
+      hbm2ddl.method: create-drop
+      show_sql: true
+      format_sql: true
+      dialect: org.hibernate.dialect.MySQLDialect
