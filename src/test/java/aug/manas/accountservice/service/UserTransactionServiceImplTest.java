@@ -4,11 +4,7 @@
 package aug.manas.accountservice.service;
 
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.verify;
@@ -62,7 +58,7 @@ public class UserTransactionServiceImplTest {
 	@InjectMocks
 	private UserTransactionService userTransactionService = new UserTransactionServiceImpl(userTransactionRepository,
 			expTransactionService);
-	
+
 	private AccountTransaction transaction1;
 	private AccountTransaction transaction2;
 	private AccountTransaction transaction3;
@@ -93,7 +89,7 @@ public class UserTransactionServiceImplTest {
 		listOfTransactionsFromRepository.add(transaction1);
 		listOfTransactionsFromRepository.add(transaction2);
 		listOfTransactionsFromRepository.add(transaction3);
-		
+
 		expUserTransaction = new UserTransaction(1L, transaction1.getId());
 
 	}
@@ -105,9 +101,10 @@ public class UserTransactionServiceImplTest {
 	public void test_get_listof_transactions_for_userId() {
 		logger.debug("Testing get transactions for user");
 
-		when(userTransactionRepository.findByUserId(anyLong())).thenReturn(Arrays.asList(1l,2l,3l));
-		when(accountTransactionRepository.findByIdIn(anyListOf(Long.class))).thenReturn(listOfTransactionsFromRepository);
-		
+		when(userTransactionRepository.findByUserId(anyLong())).thenReturn(Arrays.asList(1l, 2l, 3l));
+		when(accountTransactionRepository.findByIdIn(anyListOf(Long.class)))
+				.thenReturn(listOfTransactionsFromRepository);
+
 		List<AccountTransaction> transactionsReturned = userTransactionService.getAllTransactionsforUser(1L);
 		assertNotNull(transactionsReturned);
 		assertEquals(listOfTransactionsFromRepository.size(), transactionsReturned.size());
@@ -127,9 +124,9 @@ public class UserTransactionServiceImplTest {
 
 		List<Long> emptylistOfTransactionsFromRepository = new ArrayList<>();
 		when(userTransactionRepository.findByUserId(anyLong())).thenReturn(emptylistOfTransactionsFromRepository);
-		List<AccountTransaction> transactionsReturned = userTransactionService.getAllTransactionsforUser(20);
-		assertNotNull(transactionsReturned);
-		assertTrue(transactionsReturned.size() == 0);
+		List<AccountTransaction> transactionsReturned = userTransactionService.getAllTransactionsforUser(20L);
+		assertNull(transactionsReturned);
+//		assertTrue(transactionsReturned.size() == 0);
 
 	}
 
@@ -141,10 +138,10 @@ public class UserTransactionServiceImplTest {
 	@Test
 	public void should_add_transaction_for_userId() {
 		logger.debug("Testing should_add_transaction_for_user");
-		
+
 		AccountTransaction inputToTransactionSvc = transaction1;
 		AccountTransaction outputTransaction = transaction1;
-		
+
 		outputTransaction.setId(10l);
 
 		when(accountTransactionRepository.save(inputToTransactionSvc)).thenReturn(outputTransaction);
@@ -175,15 +172,15 @@ public class UserTransactionServiceImplTest {
 		verify(userTransactionRepository).delete(2l);
 		assertTrue(transactionDeleted);
 	}
-	
-	
+
 	/*
-	 * Test to verify whether a transaction that doesn't exist for deletion is handled
+	 * Test to verify whether a transaction that doesn't exist for deletion is
+	 * handled
 	 */
 	@Test
 	public void should_handle_delete_transaction_for_notexisting_transactionId() {
 		logger.debug("Testing should_delete_transaction_by_transactionId");
-		when(accountTransactionRepository.findOne(anyLong())).thenReturn(transaction1) ;
+		when(accountTransactionRepository.findOne(anyLong())).thenReturn(transaction1);
 		boolean transactionDeleted = userTransactionService.deleteTransaction(2l);
 		verify(accountTransactionRepository).delete(anyLong());
 		assertFalse(transactionDeleted);
@@ -198,13 +195,14 @@ public class UserTransactionServiceImplTest {
 
 		AccountTransaction inputToTransactionSvc = transaction1;
 		inputToTransactionSvc.setId(1l);
-		
+
 		AccountTransaction expectedOutputFromSvc = transaction2;
 		expectedOutputFromSvc.setId(10l);
 
 		when(accountTransactionRepository.save(inputToTransactionSvc)).thenReturn(expectedOutputFromSvc);
-		
-		AccountTransaction actualUpdatedTransaction = userTransactionService.updateTransaction(2L, inputToTransactionSvc);
+
+		AccountTransaction actualUpdatedTransaction = userTransactionService.updateTransaction(2L,
+				inputToTransactionSvc);
 
 		assertNotNull(actualUpdatedTransaction);
 		assertEquals(expectedOutputFromSvc.getId(), actualUpdatedTransaction.getId());

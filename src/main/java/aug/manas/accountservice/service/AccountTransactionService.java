@@ -20,7 +20,8 @@ public interface AccountTransactionService {
 	AccountTransaction updateTransaction(AccountTransaction transaction);
 
 	AccountTransaction getTransactionById(Long transactionId);
-	
-	
+
 	List<AccountTransaction> getTransactionsListByIds(List<Long> idList);
+
+	boolean deleteTransactionsListByIds(List<Long> idList);
 }

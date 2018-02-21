@@ -1,7 +1,11 @@
 package aug.manas.accountservice;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,8 +26,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,17 +49,29 @@ import org.springframework.web.context.WebApplicationContext;
 
 import aug.manas.accountservice.model.AccountTransaction;
 import aug.manas.accountservice.model.TransactionType;
+import aug.manas.accountservice.repository.AccountTransactionRepository;
+import aug.manas.accountservice.repository.UserTransactionRepository;
+import aug.manas.accountservice.service.UserTransactionService;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @WebAppConfiguration
-// @WebMvcTest
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AccountServiceIT {
 	private static final Logger logger = LoggerFactory.getLogger(AccountServiceIT.class);
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
+
+	@Mock
+	UserTransactionService userTransactionService;
+
+	@Mock
+	AccountTransactionRepository accountTransactionRepository;
+
+	@Mock
+	UserTransactionRepository userTransactionRepository;
 
 	@Autowired
 	void setConverters(HttpMessageConverter<?>[] converters) {
@@ -70,6 +90,7 @@ public class AccountServiceIT {
 
 	@Before
 	public void setUp() {
+		MockitoAnnotations.initMocks(this);
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
 		Calendar cal = Calendar.getInstance();
@@ -83,7 +104,7 @@ public class AccountServiceIT {
 		Date date3 = cal.getTime();
 
 		AccountTransaction transaction1 = new AccountTransaction("Salary", date1, TransactionType.INCOME,
-				new BigDecimal(5000));
+				new BigDecimal(5000.00));
 		AccountTransaction transaction2 = new AccountTransaction("Rent", date2, TransactionType.EXPENSE,
 				new BigDecimal(2000.00));
 		AccountTransaction transaction3 = new AccountTransaction("Cable", date3, TransactionType.EXPENSE,
@@ -107,13 +128,13 @@ public class AccountServiceIT {
 	 * Test to add transaction for user
 	 */
 	@Test
-	public void should_add_transaction_for_user() throws Exception {
+	public void should_1_add_transaction_for_user() throws Exception {
 		logger.debug("Testing should_add_transaction_for_user");
 		this.mockMvc
-				.perform(post("/api/transactions/1/transaction/").content(this.json(listExpTransactions.get(0)))
+				.perform(post("/api/acct-service/1/transaction/").content(this.json(listExpTransactions.get(0)))
 						.contentType(contentType))
 				.andExpect(status().isCreated()).andDo(print()).andExpect(content().contentType(contentType))
-				.andExpect(jsonPath("$.id", is(4)))
+				.andExpect(jsonPath("$.id", is(1)))
 				.andExpect(jsonPath("$.description", is(listExpTransactions.get(0).getDescription())))
 				.andExpect(jsonPath("$.amount").value(listExpTransactions.get(0).getAmount()))
 				.andExpect(jsonPath("$.date",
@@ -126,13 +147,13 @@ public class AccountServiceIT {
 	 * Test to update the transaction
 	 */
 	@Test
-	public void should_update_transaction_for_user() throws Exception {
+	public void should_2_update_transaction_for_user() throws Exception {
 		logger.debug("Testing should_update_transaction_for_user");
 		this.mockMvc
-				.perform(put("/api/transactions/1/transaction/4").content(this.json(listExpTransactions.get(0)))
+				.perform(put("/api/acct-service/1/transaction/1").content(this.json(listExpTransactions.get(0)))
 						.contentType(contentType))
 				.andExpect(status().isOk()).andDo(print()).andExpect(content().contentType(contentType))
-				.andExpect(jsonPath("$.id", is(4)))
+				.andExpect(jsonPath("$.id", is(1)))
 				.andExpect(jsonPath("$.description", is(listExpTransactions.get(0).getDescription())))
 				.andExpect(jsonPath("$.amount").value(listExpTransactions.get(0).getAmount()))
 				.andExpect(jsonPath("$.date",
@@ -142,26 +163,69 @@ public class AccountServiceIT {
 	}
 
 	/*
-	 * Test to delete the transaction
+	 * Test to get all transactions for user
 	 */
 	@Test
-	public void should_delete_transaction_for_user() throws Exception {
-		logger.debug("Testing should_delete_transaction_for_user");
-		this.mockMvc.perform(delete("/api/transactions/1/transaction/{1}", 1L)).andExpect(status().isOk()).andDo(print());
+	public void should_3_return_alltransactions_for_user_success() throws Exception {
+		logger.debug("Testing should_return_alltransaction_for_user_success");
+		this.mockMvc.perform(get("/api/acct-service/1/transaction/")).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().contentType(contentType)).andExpect(jsonPath("$", hasSize(1)))
+				.andExpect(jsonPath("$[0].id", is(1)))
+				.andExpect(jsonPath("$[0].description", is(listExpTransactions.get(0).getDescription())))
+				.andExpect(jsonPath("$[0].amount").value("5000.0"))
+				.andExpect(jsonPath("$[0].date",
+						is(new SimpleDateFormat("yyyy-MM-dd").format(listExpTransactions.get(0).getDate()))))
+				.andExpect(jsonPath("$[0].type").value(listExpTransactions.get(0).getType().toString()));
 
 	}
 
 	/*
-	 * Test to get all transactions for user
-	 */ 
+	 * Test fail to get all transactions for user
+	 */
 	@Test
-	public void should_return_alltransaction_for_user() throws Exception {
-		logger.debug("Testing should_return_alltransaction_for_user");
+	public void should_4_return_alltransactions_for_user_fail() throws Exception {
+		logger.debug("Testing should_return_alltransaction_for_user_fail");
+		this.mockMvc.perform(get("/api/acct-service/10/transaction/")).andDo(print()).andExpect(status().isNoContent());
+
+	}
+
+	/*
+	 * Test to get transaction for user id and transaction id in path
+	 */
+	@Test
+	public void should_4_return_transaction_for_user_for_transactionId_success() throws Exception {
+		logger.debug("Testing should_return_transaction_for_user_for_transactionId_success");
 		this.mockMvc
-		.perform(get("/api/transactions/1"))
-		.andDo(print())
-		.andExpect(status().isOk())
-		;
+				.perform(get("/api/acct-service/1/transaction/1").content(this.json(listExpTransactions.get(0)))
+						.contentType(contentType))
+				.andExpect(status().isOk()).andDo(print()).andExpect(content().contentType(contentType))
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.description", is(listExpTransactions.get(0).getDescription())))
+				.andExpect(jsonPath("$.amount").value("5000.0"))
+				.andExpect(jsonPath("$.date",
+						is(new SimpleDateFormat("yyyy-MM-dd").format(listExpTransactions.get(0).getDate()))))
+				.andExpect(jsonPath("$.type").value(listExpTransactions.get(0).getType().toString()));
+
+	}
+
+	/*
+	 * Test fail to transaction for user id and transaction id in path
+	 */
+	@Test
+	public void should_4_return_transaction_for_user_for_transactionId_fail() throws Exception {
+		logger.debug("Testing should_return_transaction_for_user_for_transactionId_fail");
+		this.mockMvc.perform(get("/api/acct-service/1/transaction/10")).andDo(print()).andExpect(status().isNoContent());
+
+	}
+
+	/*
+	 * Test to delete the transaction
+	 */
+	@Test
+	public void should_5_delete_transaction_for_user() throws Exception {
+		logger.debug("Testing should_delete_transaction_for_user");
+		this.mockMvc.perform(delete("/api/acct-service/1/transaction/{1}", 1L)).andExpect(status().isOk())
+				.andDo(print());
 
 	}
 

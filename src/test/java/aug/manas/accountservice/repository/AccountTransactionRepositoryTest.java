@@ -1,12 +1,12 @@
 package aug.manas.accountservice.repository;
 
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -62,7 +62,8 @@ public class AccountTransactionRepositoryTest {
 		cal.set(2018, 1, 19);
 		Date date3 = cal.getTime();
 
-		AccountTransaction transaction1 = new AccountTransaction("Salary", date1, TransactionType.INCOME, new BigDecimal(5000));
+		AccountTransaction transaction1 = new AccountTransaction("Salary", date1, TransactionType.INCOME,
+				new BigDecimal(5000));
 		AccountTransaction transaction2 = new AccountTransaction("Rent", date2, TransactionType.EXPENSE,
 				new BigDecimal(2000.00));
 		AccountTransaction transaction3 = new AccountTransaction("Cable", date3, TransactionType.EXPENSE,
@@ -92,7 +93,8 @@ public class AccountTransactionRepositoryTest {
 		Date date = cal.getTime();
 
 		// Creating a new transaction to ensure save occurs via repository.
-		AccountTransaction exp = new AccountTransaction("Mobile", date, TransactionType.EXPENSE, new BigDecimal(100.00));
+		AccountTransaction exp = new AccountTransaction("Mobile", date, TransactionType.EXPENSE,
+				new BigDecimal(100.00));
 		AccountTransaction expTransactionCreated = repository.save(exp);
 
 		assertThat(expTransactionCreated, hasProperty("description"));
@@ -104,7 +106,7 @@ public class AccountTransactionRepositoryTest {
 		assertEquals(expTransactionCreated.getDescription(), "Mobile");
 		assertTrue(expTransactionCreated.getDate().compareTo(exp.getDate()) == 0);
 		assertEquals(TransactionType.EXPENSE, expTransactionCreated.getType());
-		assertEquals(1, expTransactionCreated.getId());
+		assertTrue(expTransactionCreated.getId().equals(1L));
 		assertEquals(expTransactionCreated.getAmount(), new BigDecimal(100.00));
 	}
 
@@ -140,20 +142,20 @@ public class AccountTransactionRepositoryTest {
 		AccountTransaction transactionById1 = repository.findOne(1l);
 
 		assertNotNull(transactionById1);
-		assertEquals(transactionById1.getId(), 1L);
+		assertTrue(transactionById1.getId().equals(1L));
 		assertEquals(transactionById1.getDescription(), "Mobile");
 		assertEquals(sdf.format(transactionById1.getDate()), sdf.format(date1));
 		assertEquals(transactionById1.getType(), TransactionType.EXPENSE);
-		assertTrue( transactionById1.getAmount().compareTo(new BigDecimal(100.00)) == 0 );
+		assertTrue(transactionById1.getAmount().compareTo(new BigDecimal(100.00)) == 0);
 
 		AccountTransaction transactionById2 = repository.findOne(2l);
 
 		assertNotNull(transactionById2);
-		assertEquals(transactionById2.getId(), 2L);
+		assertTrue(transactionById2.getId().equals(2L));
 		assertEquals(transactionById2.getDescription(), "Salary");
 		assertEquals(sdf.format(transactionById2.getDate()), sdf.format(date2));
 		assertEquals(transactionById2.getType(), TransactionType.INCOME);
-		assertTrue( transactionById2.getAmount().compareTo(new BigDecimal(5000.00)) == 0 );
+		assertTrue(transactionById2.getAmount().compareTo(new BigDecimal(5000.00)) == 0);
 	}
 
 	/*
@@ -196,12 +198,12 @@ public class AccountTransactionRepositoryTest {
 		assertNull(nonexistingtransactionById);
 
 	}
-	
+
 	/*
 	 * Test to get list of transactions for given date range
 	 */
 	@Test
-	public void test_get_list_of_exptransactions_for_daterange () {
+	public void test_get_list_of_exptransactions_for_daterange() {
 		logger.debug("Testing for get list of transactions withing given date range");
 
 		Calendar cal = Calendar.getInstance();
@@ -217,19 +219,22 @@ public class AccountTransactionRepositoryTest {
 		assertThat(listExpTransactions, containsInAnyOrder(listExpTransactions.get(0), listExpTransactions.get(1)));
 
 	}
-	
+
 	/*
 	 * Test to get list of last 10 transactions
 	 */
-//	@Test
-//	public void test_get_list_of_last10_exptransactions () {
-//		logger.debug("Testing for get list of 10 latest transactions");
-//
-//
-//		List<ExpTransaction> list10ExpTransactions = repository.findFist10ByDateOrderByDateDesc();
-//		assertNotNull(list10ExpTransactions);
-//		assertEquals(5, listExpTransactions.size());
-//		assertThat(listExpTransactions, containsInAnyOrder(listExpTransactions.get(0), listExpTransactions.get(1)));
-//
-//	}
+	// @Test
+	// public void test_get_list_of_last10_exptransactions () {
+	// logger.debug("Testing for get list of 10 latest transactions");
+	//
+	//
+	// List<ExpTransaction> list10ExpTransactions =
+	// repository.findFist10ByDateOrderByDateDesc();
+	// assertNotNull(list10ExpTransactions);
+	// assertEquals(5, listExpTransactions.size());
+	// assertThat(listExpTransactions,
+	// containsInAnyOrder(listExpTransactions.get(0),
+	// listExpTransactions.get(1)));
+	//
+	// }
 }

@@ -21,43 +21,35 @@ public class UserTransaction implements Serializable {
 	private static final long serialVersionUID = -302209030368856060L;
 
 	@Column(name = "user_id")
-	private long userId;
-	
-	/*@OneToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "user_transaction", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "trans_id"))
-	private List<ExpTransaction> transactions;*/
+	private Long userId;
 
-/*	@OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "trans_id")
-	private ExpTransaction transaction; */
-	
 	@Id
 	@Column(name = "trans_id")
-	private long transId;
+	private Long transId;
 
-	public long getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
 
-	public void setUserId(long userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 
-	public long getTransId() {
+	public Long getTransId() {
 		return transId;
 	}
 
-	public void setTransId(long transId) {
+	public void setTransId(Long transId) {
 		this.transId = transId;
 	}
 
-	protected UserTransaction(){
-		
+	protected UserTransaction() {
+
 	}
-	
-	public UserTransaction(long userId, long transId){
+
+	public UserTransaction(Long userId, Long transId) {
 		this.userId = userId;
 		this.transId = transId;
 	}
-	
+
 }

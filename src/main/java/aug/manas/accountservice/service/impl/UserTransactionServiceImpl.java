@@ -55,12 +55,12 @@ public class UserTransactionServiceImpl implements UserTransactionService {
 	 *         transaction.
 	 */
 	@Override
-	public AccountTransaction addTransaction(long userId, AccountTransaction expTransaction) {
+	public AccountTransaction addTransaction(Long userId, AccountTransaction expTransaction) {
 		logger.debug("Adding transaction for userId " + userId);
 		AccountTransaction savedTransaction = null;
 
 		// check if userID greater than or equal 1
-		if (userId >= 1) {
+		if (userId != null && userId >= 1) {
 			savedTransaction = accountTransactionService.addTransaction(expTransaction);
 			if (savedTransaction != null) {
 				UserTransaction saveUserTransaction = userTransactionRepository
@@ -90,10 +90,10 @@ public class UserTransactionServiceImpl implements UserTransactionService {
 	 */
 
 	@Override
-	public boolean deleteTransaction(long transactionId) {
+	public boolean deleteTransaction(Long transactionId) {
 		logger.debug("Deleting transactionId " + transactionId);
 		boolean result = false;
-		if (transactionId <= 0) {
+		if (transactionId == null || transactionId <= 0) {
 			logger.error("Transaction cannot deleted for transactionId " + transactionId);
 		} else {
 			if (accountTransactionService.deleteTransaction(transactionId)) {
@@ -120,14 +120,28 @@ public class UserTransactionServiceImpl implements UserTransactionService {
 	 */
 
 	@Override
-	public boolean deleteAllTransactions(long userId) {
+	public boolean deleteAllTransactions(Long userId) {
 		boolean result = false;
 		logger.debug("Deleting all transactions for user id " + userId);
-		if (userId > 0) {
-			userTransactionRepository.deleteByUserId(userId);
-			if (getAllTransactionsforUser(userId) == null) {
-				result = true;
+		if (userId != null && userId > 0) {
+			List<Long> userTransactionIds = userTransactionRepository.findByUserId(userId);
+			if (userTransactionIds != null && !userTransactionIds.isEmpty()) {
+				if (accountTransactionService.deleteTransactionsListByIds(userTransactionIds)) {
+					userTransactionRepository.deleteByUserId(userId);
+
+					if (getAllTransactionsforUser(userId) == null) {
+						result = true;
+					} else {
+						logger.error("Transactions not deleted for userId " + userId);
+					}
+				} else {
+					logger.error("Transactions not deleted for userId " + userId + " from account transactions");
+				}
+
+			} else {
+				logger.error("No transactions found for userId " + userId);
 			}
+
 		} else {
 			logger.error("Cannot delete all transactions for user id " + userId);
 		}
@@ -139,9 +153,9 @@ public class UserTransactionServiceImpl implements UserTransactionService {
 	 * updateTransaction for a given userId.
 	 */
 	@Override
-	public AccountTransaction updateTransaction(long userId, AccountTransaction expTransaction) {
+	public AccountTransaction updateTransaction(Long userId, AccountTransaction expTransaction) {
 		logger.debug("Updating transactions for user id" + userId);
-		if (userId <= 0) {
+		if (userId == null || userId <= 0) {
 			logger.error("Cannot uodate transaction for userId " + userId);
 		}
 		return accountTransactionService.updateTransaction(expTransaction);
@@ -163,17 +177,23 @@ public class UserTransactionServiceImpl implements UserTransactionService {
 	 */
 
 	@Override
-	public List<AccountTransaction> getAllTransactionsforUser(long userId) {
+	public List<AccountTransaction> getAllTransactionsforUser(Long userId) {
 		logger.debug("Getting all transactions for userID " + userId);
-	
-		List<Long> userTransactionIds = userTransactionRepository.findByUserId(userId);
-		
-		List<AccountTransaction> accountTransactions = accountTransactionService.getTransactionsListByIds(userTransactionIds);
-		
+		List<AccountTransaction> accountTransactions = null;
+		if (userId != null && userId >= 1) {
+			List<Long> userTransactionIds = userTransactionRepository.findByUserId(userId);
+			if (userTransactionIds != null && !userTransactionIds.isEmpty()) {
+				accountTransactions = accountTransactionService.getTransactionsListByIds(userTransactionIds);
+			} else {
+				logger.error("No transactions found for userId " + userId);
+			}
+
+		} else {
+			logger.error("UserId not valid");
+		}
+
 		return accountTransactions;
 
 	}
-	
-
 
 }

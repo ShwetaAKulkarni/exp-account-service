@@ -33,7 +33,7 @@ public class AccountTransaction implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "trans_Id")
-	private long id;
+	private Long id;
 
 	private String description;
 
@@ -46,12 +46,6 @@ public class AccountTransaction implements Serializable {
 	private Date date;
 	private BigDecimal amount;
 
-
-//    @OneToOne(mappedBy = "accountTransaction")
-//	private UserTransaction userTransaction;
-
-
-
 	protected AccountTransaction() {
 
 	}
@@ -63,19 +57,11 @@ public class AccountTransaction implements Serializable {
 		this.amount = amount;
 	}
 
-	public AccountTransaction(long id, String description, Date date, TransactionType type, BigDecimal amount) {
-		this.id = id;
-		this.description = description;
-		this.date = date;
-		this.type = type;
-		this.amount = amount;
-	}
-	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -111,21 +97,11 @@ public class AccountTransaction implements Serializable {
 		this.amount = amount;
 	}
 
-//	@OneToOne(fetch = FetchType.LAZY, mappedBy = "account_transaction", cascade = CascadeType.ALL)
-////	@JoinColumn(name="transId")
-//	public UserTransaction getUserTransaction() {
-//		return userTransaction;
-//	}
-//
-//	public void setUserTransaction(UserTransaction userTransaction) {
-//		this.userTransaction = userTransaction;
-//	}
-	
 	@Override
-	public String toString(){
-		return "AccountTransaction:: TransactionId: " +this.getId() + " Description: " +this.getDescription()
-		+ " TransactionType: " +this.getType() + "TransactionDate: "+ this.getDate()
-		+ " Amount: "+ this.getAmount();
-		
+	public String toString() {
+		return "AccountTransaction:: TransactionId: " + this.getId() + " Description: " + this.getDescription()
+				+ " TransactionType: " + this.getType() + "TransactionDate: " + this.getDate() + " Amount: "
+				+ this.getAmount();
+
 	}
 }

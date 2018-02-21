@@ -3,6 +3,7 @@
  */
 package aug.manas.accountservice.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -49,7 +50,7 @@ public class AccountTransactionServiceImpl implements AccountTransactionService 
 	public boolean deleteTransaction(Long transactionId) {
 		boolean result = false;
 		logger.debug("Deleting transaction for transaction Id" + transactionId);
-		if (transactionId <= 0) {
+		if (transactionId == null || transactionId <= 0) {
 			logger.error("Transaction cannot deleted for transactionId " + transactionId);
 
 		} else {
@@ -87,25 +88,46 @@ public class AccountTransactionServiceImpl implements AccountTransactionService 
 		return accountTransactionById;
 
 	}
-	//
-	// /* (non-Javadoc)
-	// * @see
-	// aug.manas.accountservice.service.AccountTransactionService#getTransactionsListByIds(long[])
-	// */
-	// @Override
-	// public List<AccountTransaction> getTransactionsListByIds(long... id) {
-	// accountTransactionRepository.findById(id);
-	//
-	// return null;
-	// }
 
-	/* (non-Javadoc)
-	 * @see aug.manas.accountservice.service.AccountTransactionService#getTransactionsListByIds(java.util.List)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see aug.manas.accountservice.service.AccountTransactionService#
+	 * getTransactionsListByIds(java.util.List)
 	 */
 	@Override
 	public List<AccountTransaction> getTransactionsListByIds(List<Long> idList) {
-		// TODO Auto-generated method stub
-		return accountTransactionRepository.findByIdIn(idList);
+		logger.debug("Getting transaction list for Ids in list ");
+		List<AccountTransaction> accountTransactionList = null;
+		if (idList != null && !idList.isEmpty()) {
+			accountTransactionList = accountTransactionRepository.findByIdIn(idList);
+		}
+		return accountTransactionList;
+	}
+
+	/**
+	 * Method to delete all transactions by transaction Ids in list
+	 */
+	@Override
+	public boolean deleteTransactionsListByIds(List<Long> idList) {
+		logger.debug("Deleting transaction list for Ids in list " + Arrays.asList(idList));
+		boolean result = false;
+		if (idList != null && !idList.isEmpty()) {
+			accountTransactionRepository.deleteByIdIn(idList);
+
+			// validating whether the transactions in list are deleted
+			List<AccountTransaction> accountTransactionList = getTransactionsListByIds(idList);
+			if (accountTransactionList == null || accountTransactionList.isEmpty()) {
+				logger.info("Transactions deleted successfully for Ids in list ");
+				result = true;
+			} else {
+				logger.error("Transactions not deleted for IDs " + Arrays.asList(idList));
+			}
+
+		} else {
+			logger.info("List is either null or empty");
+		}
+		return result;
 	}
 
 }

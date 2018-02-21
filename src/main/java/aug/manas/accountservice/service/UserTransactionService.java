@@ -13,10 +13,15 @@ import aug.manas.accountservice.model.AccountTransaction;
  */
 public interface UserTransactionService {
 
-	AccountTransaction addTransaction(long userId, AccountTransaction t);
-	boolean deleteTransaction(long transId);
-	boolean deleteAllTransactions(long userId);
-	AccountTransaction updateTransaction(long userId, AccountTransaction t);
-	List<AccountTransaction> getAllTransactionsforUser(long userId);
+	AccountTransaction addTransaction(Long userId, AccountTransaction transaction);
+
+	boolean deleteTransaction(Long transId);
+
+	boolean deleteAllTransactions(Long userId);
+
+	AccountTransaction updateTransaction(Long userId, AccountTransaction Long);
+
+	List<AccountTransaction> getAllTransactionsforUser(Long userId);
+
 	AccountTransaction findTransactionByTransactionId(Long transactionId);
 }

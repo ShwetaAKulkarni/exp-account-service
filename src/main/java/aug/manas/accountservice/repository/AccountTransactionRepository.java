@@ -23,12 +23,11 @@ public interface AccountTransactionRepository extends JpaRepository<AccountTrans
 
 	@Query("SELECT trans FROM AccountTransaction trans WHERE trans.date BETWEEN :fromDate AND :toDate ")
 	List<AccountTransaction> findByDate(@Param("fromDate") Date fromDate, @Param("toDate") Date toDate);
-	
+
 	List<AccountTransaction> findByIdIn(List<Long> idList);
-	
-//	AccountTransaction findById(@Param("id") long id);
+
+	void deleteByIdIn(List<Long> idList);
 	
 //	List<ExpTransaction> findFist10ByDateOrderByDateDesc();
-
 
 }
